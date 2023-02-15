@@ -1,0 +1,37 @@
+{
+    "questions": [
+        "Ce se afiseaza la executia programului urmator:\n```c\n#include <stdio.h>\n \nint main()\n{\n\tint a=5;\n\t{\n\t\tint b=10;\n\t\t++b;\n\t\t++a;\n\t\t{\n\t\t\tint a=20;\n\t\t\t++a;\n\t\t\ta=++b;\n\t\t}\n\t\t++a;\n\t\t++b;\n\t\tprintf(\"%d %d\",a,b);\n\t}\n\tprintf(\" %d\",b);\n\treturn 0;\n}\n```\n \nAlegeti o optiune:\n",
+        "Care sunt instruc\u0163iunile corecte de atribuire pentru ca, la rularea secven\u0163ei de mai jos, s\u0103 se afi\u015feze pe ecran x = 1.500000?\n```c\nint a = 3;\ndouble x;\nx = ...\nprintf(\"x = %lf\", x);\n```\n",
+        "Ce se afiseaza la rularea programului? \n```c\nint main(void)\n{\n    int a = 5, b = 6, c = 7;\n    printf(\"%d\", !((b + c) > (a + 10)));\n    return 0;\n}\n```\n"
+    ],
+    "answers": [
+        [
+            "Eroare - la al doilea printf variabila b este nedeclarata\n",
+            "7 13 7\n",
+            "13 13 7\n",
+            "8 7 8\n"
+        ],
+        [
+            "```c\nx = a / (double) 2;\n```\n",
+            "```c\nx = a / 2;\n```\n",
+            "```c\nx = a / 2.;\n```\n",
+            "```c\nx = a. / 2.;\n```\n",
+            "```c\nx = a. / 2;\n```\n",
+            "```c\nx = (double) a / 2;\n```\n",
+            "```c\nx = (double) (a / 2);\n```\n",
+            "```c\nx = (double) a / (double) 2;\n```\n"
+        ],
+        []
+    ],
+    "correct_answers": [
+        [
+            1
+        ],
+        [
+            1, 3, 6, 8
+        ],
+        [
+            "1"
+        ]
+    ]
+}
