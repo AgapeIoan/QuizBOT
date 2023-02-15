@@ -20,7 +20,7 @@ async def ping(inter):
 
 @bot.listen()
 async def on_ready():
-    game = disnake.Activity(name="Mentenanta temporara", type=disnake.ActivityType.watching)
+    game = disnake.Activity(name="quizes", type=disnake.ActivityType.watching)
     await bot.change_presence(activity=game, status=disnake.Status.dnd)
 
     print_log("Connected succesfully!")
@@ -37,7 +37,7 @@ if not DEBUG_STATE:
     print_log("DEBUG_STATE is False, production token is going to be used!")
     for i in range(3):
         print_log("Bot is starting in " + str(3*5 - i*5) + " seconds.")
-        # time.sleep(5)
+        time.sleep(5)
 
 # load cog
 for file in os.listdir("cogs"):
