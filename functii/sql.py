@@ -1,6 +1,7 @@
 import json
 
 from mysql.connector import connect, Error
+from functii.quiz.utils import QUESTIONS_DB
 
 with open("storage/configs/sql.json", "r", encoding='utf-8') as f:
     SQL_CONFIG = json.load(f)
@@ -36,6 +37,19 @@ def send_data_to_db(discord_uid, question_number, answer_number):
     connection.commit()
     cursor.close()
     connection.close()
+
+def send_answer_to_db(discord_uid, question_number, answer_number, answers=None, shuffled=False):
+    if shuffled:
+        # the answer_number is invalid, we need to find the correct one
+        if not answers:
+            raise Exception("Answers list not provided but needed for finding the correct answer for the database.")
+    
+        original_answers = QUESTIONS_DB["answers"][question_number - 1].copy()
+        good_answer = answers[answer_number - 1]
+        answer_number = original_answers.index(good_answer) + 1
+
+    send_data_to_db(discord_uid, question_number, answer_number)
+        
 
 def read_answered_questions(discord_uid):
     connection = connect_to_db()

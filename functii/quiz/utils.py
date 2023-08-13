@@ -3,6 +3,7 @@ import json
 import datetime
 import disnake
 import itertools
+import random
 
 from functii.debug import print_debug, print_log
 
@@ -13,6 +14,28 @@ def ranges(i):
     for a, b in itertools.groupby(enumerate(i), lambda pair: pair[1] - pair[0]):
         b = list(b)
         yield b[0][1], b[-1][1]
+
+def shuffle_answers(answers: list, correct_answers: list):
+    if not answers: # modal
+        return answers, correct_answers
+    elif correct_answers == [0]: # no answer
+        return random.shuffle(answers), correct_answers
+
+    answers_dict = {}
+    for ans, index in zip(answers, range(1, 100)):
+        if index in correct_answers:
+            answers_dict[ans] = index
+        else:
+            answers_dict[ans] = 0
+
+    random.shuffle(answers)
+
+    new_correct_answers = []
+    for ans, index in zip(answers, range(1, 100)):
+        if answers_dict[ans] != 0:
+            new_correct_answers.append(index)
+
+    return answers, new_correct_answers
 
 def set_buttons_red_and_green(self, buttons_number: int, greens = []):
     answer_buttons = get_answer_buttons(self, buttons_number)
@@ -86,8 +109,10 @@ def create_message(inter, numar_intrebare = None):
     
     inter.current_question_number = numar_intrebare
     inter.question = QUESTIONS_DB["questions"][numar_intrebare - 1]
-    inter.answers = QUESTIONS_DB["answers"][numar_intrebare - 1]
-    inter.correct_answers = QUESTIONS_DB["correct_answers"][numar_intrebare - 1]
+    inter.answers = QUESTIONS_DB["answers"][numar_intrebare - 1].copy()
+    inter.correct_answers = QUESTIONS_DB["correct_answers"][numar_intrebare - 1].copy()
+
+    inter.answers, inter.correct_answers = shuffle_answers(inter.answers, inter.correct_answers)
 
     print_debug("Current question number: " + str(inter.current_question_number))
 

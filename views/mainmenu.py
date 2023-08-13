@@ -1,9 +1,9 @@
 import asyncio
 import disnake
 
-from functii.quiz.utils import set_buttons_red_and_green, create_message, reset_buttons, remove_answer_buttons, find_button_by_custom_id
+from functii.quiz.utils import set_buttons_red_and_green, create_message, reset_buttons, disable_answer_buttons, remove_answer_buttons, find_button_by_custom_id
 from functii.debug import print_debug, print_log
-from functii.sql import send_data_to_db
+from functii.sql import send_answer_to_db
 from views.userinput import AnswerUserInput
 
 class MainMenu(disnake.ui.View):
@@ -14,6 +14,7 @@ class MainMenu(disnake.ui.View):
         super().__init__(timeout=0)
         self.correct_answers = correct_answers
         self.current_question_number = current_question_number
+        self.answers = answers
         self.question = question
         self.buttons_number = len(answers)
         self.free_row = 0
@@ -34,7 +35,7 @@ class MainMenu(disnake.ui.View):
             return True
 
         await interaction.response.send_message("**❗ Nu poti folosi comanda deoarece nu esti autorul acesteia!**", ephemeral=True)
-        
+
         return False
     
     @disnake.ui.button(style=disnake.ButtonStyle.green, label="Trimite", custom_id="send", row=4)
@@ -58,16 +59,18 @@ class MainMenu(disnake.ui.View):
             await interaction.response.send_modal(modal)
 
             await interaction.edit_original_message(view=self)
-            send_data_to_db(self.original_author.id, self.current_question_number, 0)
+            send_answer_to_db(self.original_author.id, self.current_question_number, 0)
             
         elif possible_answers == self.correct_answers:
             self = set_buttons_red_and_green(self, self.buttons_number, self.correct_answers)
             embed = interaction.message.embeds[0]
             embed.color = disnake.Color.green()
             await interaction.response.edit_message(view=self, embed=embed)
+
         elif self.correct_answers == [0]:
             self = set_buttons_red_and_green(self, self.buttons_number)
             await interaction.response.edit_message(view=self)
+
         else:
             self = set_buttons_red_and_green(self, self.buttons_number, self.correct_answers)
             embed = interaction.message.embeds[0]
@@ -79,7 +82,7 @@ class MainMenu(disnake.ui.View):
 
         for ans in possible_answers:
             try:
-                send_data_to_db(self.original_author.id, self.current_question_number, ans)
+                send_answer_to_db(self.original_author.id, self.current_question_number, ans, self.answers, True)
             except Exception as e:
                 print_log(f"Error sending data to db: {e}")
                 pass
@@ -88,15 +91,11 @@ class MainMenu(disnake.ui.View):
     async def next_button(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
         await interaction.response.defer()
         self.current_question_number += 1
-
-        print_debug(f"childern: {self.children}")
-        print_debug(f"raw self: {self}")
-        print_debug(f"correct ans: {self.correct_answers}")
-
         self = reset_buttons(self)
         interaction = create_message(interaction, self.current_question_number)
         self.correct_answers = interaction.correct_answers
         self.question = interaction.question
+        self.answers = interaction.answers
 
         self = remove_answer_buttons(self)
 
