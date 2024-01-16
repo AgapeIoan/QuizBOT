@@ -77,13 +77,17 @@ def remove_answer_buttons(self):
             self.remove_item(i)
     return self
 
-def create_embed(inter):
+def create_embed(inter, image_url = ""):
     if inter.correct_answers == [0]:
         title = f"❗ Intrebarea #{inter.current_question_number} [FARA RASPUNS GASIT] ❗"
         inter.question = "❗ " + inter.question + "\n"
     else:
         title = f"Intrebarea #{inter.current_question_number}"
         inter.question = inter.question + "\n"
+
+    if inter.question.startswith("https://"):
+        image_url = inter.question.split("\n")[0]
+        inter.question = "\n".join(inter.question.split("\n")[1:])
 
     embed = disnake.Embed(
         title=title,
@@ -94,11 +98,13 @@ def create_embed(inter):
     try:
         icon_url = inter.author.avatar.url
     except AttributeError:
-        icon_url = "https://cdn.discordapp.com/avatars/1054834099489079379/756ff7fe4f84636087e0816c67893878.webp"
+        icon_url = ""
     embed.set_footer(text="Requested by " + str(inter.author), icon_url=icon_url)
     # embed.add_field(name="Raspuns 1", value=inter.answers[0], inline=False)
     for ans_index in range(len(inter.answers)):
         embed.add_field(name=f"Raspuns {ans_index + 1}", value=inter.answers[ans_index], inline=False)
+    
+    embed.set_image(image_url)
     return embed
 
 def create_message(inter, numar_intrebare = None):
